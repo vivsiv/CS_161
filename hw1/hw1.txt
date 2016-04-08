@@ -1,70 +1,70 @@
 Problem 1. The Padovan Sequence
 
 Test Cases
-(format t "pad 0 = 1 ~S~%" (= (pad 0) 1))
-(format t "pad 1 = 1 ~S~%" (= (pad 1) 1))
-(format t "pad 2 = 1 ~S~%" (= (pad 2) 1))
-(format t "pad 3 = 2 ~S~%" (= (pad 3) 2))
-(format t "pad 4 = 2 ~S~%" (= (pad 4) 2))
-(format t "pad 5 = 3 ~S~%" (= (pad 5) 3))
-(format t "pad 6 = 4 ~S~%" (= (pad 6) 4))
-(format t "pad 7 = 5 ~S~%" (= (pad 7) 5))
-(format t "pad 8 = 7 ~S~%" (= (pad 8) 7))
-(format t "pad 9 = 9 ~S~%" (= (pad 9) 9))
-(format t "pad 10 = 12 ~S~%" (= (pad 10) 12))
-(format t "pad 11 = 16 ~S~%" (= (pad 11) 16))
-(format t "pad 12 = 21 ~S~%" (= (pad 12) 21))
+(format t "PAD 0 = 1 ~S~%" (= (PAD 0) 1))
+(format t "PAD 1 = 1 ~S~%" (= (PAD 1) 1))
+(format t "PAD 2 = 1 ~S~%" (= (PAD 2) 1))
+(format t "PAD 3 = 2 ~S~%" (= (PAD 3) 2))
+(format t "PAD 4 = 2 ~S~%" (= (PAD 4) 2))
+(format t "PAD 5 = 3 ~S~%" (= (PAD 5) 3))
+(format t "PAD 6 = 4 ~S~%" (= (PAD 6) 4))
+(format t "PAD 7 = 5 ~S~%" (= (PAD 7) 5))
+(format t "PAD 8 = 7 ~S~%" (= (PAD 8) 7))
+(format t "PAD 9 = 9 ~S~%" (= (PAD 9) 9))
+(format t "PAD 10 = 12 ~S~%" (= (PAD 10) 12))
+(format t "PAD 11 = 16 ~S~%" (= (PAD 11) 16))
+(format t "PAD 12 = 21 ~S~%" (= (PAD 12) 21))
 
 Output
-pad 0 = 1 T
-pad 1 = 1 T
-pad 2 = 1 T
-pad 3 = 2 T
-pad 4 = 2 T
-pad 5 = 3 T
-pad 6 = 4 T
-pad 7 = 5 T
-pad 8 = 7 T
-pad 9 = 9 T
-pad 10 = 12 T
-pad 11 = 16 T
-pad 12 = 21 T
+PAD 0 = 1 T
+PAD 1 = 1 T
+PAD 2 = 1 T
+PAD 3 = 2 T
+PAD 4 = 2 T
+PAD 5 = 3 T
+PAD 6 = 4 T
+PAD 7 = 5 T
+PAD 8 = 7 T
+PAD 9 = 9 T
+PAD 10 = 12 T
+PAD 11 = 16 T
+PAD 12 = 21 T
 
-When using larger numbers like (pad 100) the program hangs. This is probably because the recursive steps required for computing the nth padovan number are 2^n. This means both execution time and stack space grow exponentially, explaining the programs inability to finish. Tail call recursion could solve the stack space problem, but a more efficient algorithm would be needed to solve the execution time problem.
+When using larger numbers like (PAD 100) the program hangs. This is probably because the recursive steps required for computing the nth padovan number are 2^n. This means both execution time and stack space grow exponentially, explaining the programs inability to finish. Tail call recursion could solve the stack space problem, but a more efficient algorithm would be needed to solve the execution time problem.
 
 
-Problem 2. Sums
+Problem 2. SUMS
 Test Cases
-(format t "sums 0 = 0 ~S~%" (= (sums 0) 0))
-(format t "sums 1 = 0 ~S~%" (= (sums 1) 0))
-(format t "sums 2 = 0 ~S~%" (= (sums 2) 0))
-(format t "sums 3 = 2 ~S~%" (= (sums 3) 1))
-(format t "sums 4 = 2 ~S~%" (= (sums 4) 1))
-(format t "sums 5 = 3 ~S~%" (= (sums 5) 2))
-(format t "sums 6 = 4 ~S~%" (= (sums 6) 3))
-(format t "sums 7 = 5 ~S~%" (= (sums 7) 4))
-(format t "sums 8 = 7 ~S~%" (= (sums 8) 6))
-(format t "sums 9 = 9 ~S~%" (= (sums 9) 8))
-(format t "sums 10 = 12 ~S~%" (= (sums 10) 11))
-(format t "sums 11 = 16 ~S~%" (= (sums 11) 15))
-(format t "sums 12 = 21 ~S~%" (= (sums 12) 20))
+(format t "SUMS 0 = 0 ~S~%" (= (SUMS 0) 0))
+(format t "SUMS 1 = 0 ~S~%" (= (SUMS 1) 0))
+(format t "SUMS 2 = 0 ~S~%" (= (SUMS 2) 0))
+(format t "SUMS 3 = 2 ~S~%" (= (SUMS 3) 1))
+(format t "SUMS 4 = 2 ~S~%" (= (SUMS 4) 1))
+(format t "SUMS 5 = 3 ~S~%" (= (SUMS 5) 2))
+(format t "SUMS 6 = 4 ~S~%" (= (SUMS 6) 3))
+(format t "SUMS 7 = 5 ~S~%" (= (SUMS 7) 4))
+(format t "SUMS 8 = 7 ~S~%" (= (SUMS 8) 6))
+(format t "SUMS 9 = 9 ~S~%" (= (SUMS 9) 8))
+(format t "SUMS 10 = 12 ~S~%" (= (SUMS 10) 11))
+(format t "SUMS 11 = 16 ~S~%" (= (SUMS 11) 15))
+(format t "SUMS 12 = 21 ~S~%" (= (SUMS 12) 20))
 
 Output
-sums 0 = 0 T
-sums 1 = 0 T
-sums 2 = 0 T
-sums 3 = 2 T
-sums 4 = 2 T
-sums 5 = 3 T
-sums 6 = 4 T
-sums 7 = 5 T
-sums 8 = 7 T
-sums 9 = 9 T
-sums 10 = 12 T
-sums 11 = 16 T
-sums 12 = 21 T
+SUMS 0 = 0 T
+SUMS 1 = 0 T
+SUMS 2 = 0 T
+SUMS 3 = 2 T
+SUMS 4 = 2 T
+SUMS 5 = 3 T
+SUMS 6 = 4 T
+SUMS 7 = 5 T
+SUMS 8 = 7 T
+SUMS 9 = 9 T
+SUMS 10 = 12 T
+SUMS 11 = 16 T
+SUMS 12 = 21 T
 
-The value for (sum i) always seems to be 1 less than (pad i), the following shows this relationship:
+The value for (SUMS i) always seems to be 1 less than (PAD i), the following shows this relationship:
 
 Pad Num: 0 1 2 3 4 5 6 7 8 9 10 11 12
 Padovan: 1 1 1 2 2 3 4 5 7 9 12 16 21
@@ -72,20 +72,20 @@ Sum Req: 0 0 0 1 1 2 3 4 6 8 11 15 20
 
 Problem 3. Anon
 Test Cases
-(format t "(anon '42) = '? ~S~%" (equal (anon '42) '?))
-(format t "(anon 'FOO) = '? ~S~%" (equal (anon 'FOO) '?))
-(format t "(anon '(((L E) F) T))) = '(((? ?) ?) ?)) ~S~%" (equal (anon '(((L E) F) T)) '(((? ?) ?) ?)))
-(format t "(anon '(5 FOO 3.1 -0.2)) = '(? ? ? ?) ~S~%" (equal (anon '(5 FOO 3.1 -0.2)) '(? ? ? ?)))
-(format t "(anon '(1 (FOO 3.1) -0.2)) = '(? (? ?) ?) ~S~%" (equal (anon '(1 (FOO 3.1) -0.2)) '(? (? ?) ?)))
-(format t "(anon '(((1 2) (FOO 3.1)) (BAR -0.2))) = '(((? ?) (? ?)) (? ?)) ~S~%" (equal (anon '(((1 2) (FOO 3.1)) (BAR -0.2))) '(((? ?) (? ?)) (? ?))))
-(format t "(anon '(R (I (G (H T))))) = '(? (? (? (? ?)))) ~S~%" (equal (anon '(R (I (G (H T))))) '(? (? (? (? ?))))))
+(format t "(ANON '42) = '? ~S~%" (equal (ANON '42) '?))
+(format t "(ANON 'FOO) = '? ~S~%" (equal (ANON 'FOO) '?))
+(format t "(ANON '(((L E) F) T))) = '(((? ?) ?) ?)) ~S~%" (equal (ANON '(((L E) F) T)) '(((? ?) ?) ?)))
+(format t "(ANON '(5 FOO 3.1 -0.2)) = '(? ? ? ?) ~S~%" (equal (ANON '(5 FOO 3.1 -0.2)) '(? ? ? ?)))
+(format t "(ANON '(1 (FOO 3.1) -0.2)) = '(? (? ?) ?) ~S~%" (equal (ANON '(1 (FOO 3.1) -0.2)) '(? (? ?) ?)))
+(format t "(ANON '(((1 2) (FOO 3.1)) (BAR -0.2))) = '(((? ?) (? ?)) (? ?)) ~S~%" (equal (ANON '(((1 2) (FOO 3.1)) (BAR -0.2))) '(((? ?) (? ?)) (? ?))))
+(format t "(ANON '(R (I (G (H T))))) = '(? (? (? (? ?)))) ~S~%" (equal (ANON '(R (I (G (H T))))) '(? (? (? (? ?))))))
 
 Output
-(anon '42) = '? T
-(anon 'FOO) = '? T
-(anon '(((L E) F) T))) = '(((? ?) ?) ?)) T
-(anon '(5 FOO 3.1 -0.2)) = '(? ? ? ?) T
-(anon '(1 (FOO 3.1) -0.2)) = '(? (? ?) ?) T
-(anon '(((1 2) (FOO 3.1)) (BAR -0.2))) = '(((? ?) (? ?)) (? ?)) T
-(anon '(R (I (G (H T))))) = '(? (? (? (? ?)))) T
+(ANON '42) = '? T
+(ANON 'FOO) = '? T
+(ANON '(((L E) F) T))) = '(((? ?) ?) ?)) T
+(ANON '(5 FOO 3.1 -0.2)) = '(? ? ? ?) T
+(ANON '(1 (FOO 3.1) -0.2)) = '(? (? ?) ?) T
+(ANON '(((1 2) (FOO 3.1)) (BAR -0.2))) = '(((? ?) (? ?)) (? ?)) T
+(ANON '(R (I (G (H T))))) = '(? (? (? (? ?)))) T
 
