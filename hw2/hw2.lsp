@@ -164,7 +164,7 @@
 		((null STATES) NIL)
 		;if a DFS for the top STATE reaches the goal return that
 		((let ((DFS_TOP (DFS (car STATES) PATH))) DFS_TOP DFS_TOP))
-		;Do a DFS on the rest of the states
+		;Continue the MULT-DFS on the rest of the states
 		(t (MULT-DFS (cdr STATES) PATH))
 	)
 )
