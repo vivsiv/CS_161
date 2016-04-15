@@ -1,0 +1,26 @@
+Problem 1
+Results of test cases shown in code
+BFS '(ROOT) = '(ROOT) T
+BFS '((((L E) F) T)) = '(T F L E) T
+BFS '((R (I (G (H T))))) = '(R I G H T) T
+BFS '(((A (B)) C (D))) = '(C A D B) T
+BFS '((T (H R E) E)) = '(T E H R E) T
+BFS '((A ((C ((E) D)) B))) = '(A B C D E) T
+
+Problem 2.
+Original Problem
+(DFS '(NIL NIL NIL NIL) NIL)
+--> ((NIL NIL NIL NIL) (T T NIL NIL) (NIL T NIL NIL) (T T T NIL) (NIL NIL T NIL) (T NIL T T) (NIL NIL T T) (T T T T))
+
+Multiple successors from initial state
+(DFS '(NIL NIL T NIL) NIL)
+--> ((NIL NIL T NIL) (T T T NIL) (NIL T NIL NIL) (T T NIL T) (NIL NIL NIL T) (T NIL T T) (NIL NIL T T) (T T T T))
+
+One move away from solution
+(DFS '(NIL NIL T T) NIL)
+--> ((NIL NIL T T) (T T T T))
+
+Invalid Start State
+(DFS '(T NIL NIL T) NIL)
+--> NIL
+
