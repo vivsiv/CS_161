@@ -715,37 +715,55 @@
 )
 
 
-(setq ptest '(
-	   (1 1 1 1 1 1 1)
-	   (1 0 0 0 0 0 1)
-	   (1 0 0 2 0 0 1)
-	   (1 0 5 6 5 4 1)
-	   (1 0 0 2 0 0 1)
-	   (1 0 0 4 0 0 1)
-	   (1 1 1 1 1 1 1)
-	)
-)
-(printState ptest)
-(setq ptestr (try-move ptest 'r))
-(printState ptestr)
-(setq ptestl (try-move ptest 'l))
-(printState ptestl)
-(setq ptestd (try-move ptest 'd))
-(printState ptestd)
-(setq ptestd (try-move ptest 'u))
-(printState ptestd)
+; (setq ptest '(
+; 	   (1 1 1 1 1 1 1)
+; 	   (1 0 0 0 0 0 1)
+; 	   (1 0 0 2 0 0 1)
+; 	   (1 0 5 6 5 4 1)
+; 	   (1 0 0 2 0 0 1)
+; 	   (1 0 0 4 0 0 1)
+; 	   (1 1 1 1 1 1 1)
+; 	)
+; )
+; (printState ptest)
+; (setq ptestr (try-move ptest 'r))
+; (printState ptestr)
+; (setq ptestl (try-move ptest 'l))
+; (printState ptestl)
+; (setq ptestd (try-move ptest 'd))
+; (printState ptestd)
+; (setq ptestd (try-move ptest 'u))
+; (printState ptestd)
 
 
 (defun next-states (s)
-  (let* ((pos (getKeeperPosition s 0))
-	 (x (car pos))
-	 (y (cadr pos))
-	 ;x and y are now the coordinate of the keeper in s.
-	 (result nil)
+  (let* (
+	  	 (pos (getKeeperPosition s 0))
+		 (x (car pos))
+		 (y (cadr pos))
+		 ;x and y are now the coordinate of the keeper in s.
+		 (result (append 
+		 			(try-move s 'r)
+		 			(try-move s 'l)
+		 			(try-move s 'd)
+		 			(try-move s 'u)
+		 		)
+		 )
 	 )
     (cleanUpList result);end
    );end let
   );
+
+; (setq s1 '((1 1 1 1 1)
+;  (1 0 0 4 1)
+;  (1 0 2 0 1)
+;  (1 0 3 0 1)
+;  (1 0 0 0 1)
+;  (1 1 1 1 1)
+; ))
+
+; (printState s1)
+; (printState (next-states s1))
 
 ; EXERCISE: Modify this function to compute the trivial 
 ; admissible heuristic.
@@ -757,8 +775,35 @@
 ; EXERCISE: Modify this function to compute the 
 ; number of misplaced boxes in s.
 ;
-(defun h1 (s)
+
+(defun count-column-boxes (r num-boxes)
+	(cond
+		((null r) num-boxes)
+		((= (car r) 2) (count-column-boxes (cdr r) (+ num-boxes 1)))
+		(t (count-column-boxes (cdr r) num-boxes))
+	)
 )
+
+(defun count-row-boxes (s num-boxes)
+	(cond
+		((null s) num-boxes)
+		(t (count-row-boxes (cdr s) (count-column-boxes (car s) num-boxes)))
+	)
+)
+
+(defun h1 (s)
+	(count-row-boxes s 0)
+)
+
+(setq ph1test '((1 1 1 1 1 1)
+	   (1 0 3 2 2 1)
+	   (1 0 2 0 0 1)
+	   (1 1 0 1 1 1)
+	   (1 0 2 0 2 1)
+	   (1 5 0 2 4 1)
+	   (1 1 1 1 1 1)))
+(format t "(h1 ph1test) = 6? --> ~S~%" (h1 ph1test))
+; (format t "(check-row (third p1)) = nil? --> ~S~%" (check-row (third p1)))
 
 ; EXERCISE: Change the name of this function to h<UID> where
 ; <UID> is your actual student ID number. Then, modify this 
