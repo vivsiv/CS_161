@@ -223,8 +223,12 @@
 ;
 
 (defun get-square (S r c)
-	(let ((row (car (nthcdr r S))))
-		(car (nthcdr c row))
+	(cond
+		((< r 0) nil)
+		((>= r (length S)) nil)
+		((< c 0) nil)
+		((>= c (length (car S))) nil)
+		(t (car (nthcdr c (car (nthcdr r S)))))
 	)
 )
 
@@ -255,449 +259,183 @@
 ; (setq p1g (set-square p1 4 3 2))
 ; (printState p1g)
 
-(defun try-right (S D K)
+;Takes a State, A function to apply to the column position, and the Keeper's start position
+(defun try-right-left (S Dfun K)
 	(let (
 			(c-pos (car K))
 			(r-pos (cadr K))
+			;What the new keepers value will be (depending on if it sits on a goal or not)
 			(new-keeper (if (= (get-square S (cadr K) (car K)) 3) 0 4))
 		)
 		(cond
-			;Invalid Moves
-			;Wall to the right
-			((= (get-square S r-pos (+ c-pos 1)) 1) nil)
-			;Box then Wall to the right
-			((and 
-				(= (get-square S r-pos (+ c-pos 1)) 2) 
-				(= (get-square S r-pos (+ c-pos 2)) 1)
-			 ) 
-			nil)
-			;Box+Goal then Wall to the right
-			((and 
-				(= (get-square S r-pos (+ c-pos 1)) 5) 
-				(= (get-square S r-pos (+ c-pos 2)) 1)
-			 ) 
-			nil)
-			;Box then Box to the right
-			((and 
-				(= (get-square S r-pos (+ c-pos 1)) 2) 
-				(= (get-square S r-pos (+ c-pos 2)) 2)
-			 ) 
-			nil)
-			;Box+goal then Box to the right
-			((and 
-				(= (get-square S r-pos (+ c-pos 1)) 5) 
-				(= (get-square S r-pos (+ c-pos 2)) 2)
-			 ) 
-			nil)
-			;Box then Box+goal to the right
-			((and 
-				(= (get-square S r-pos (+ c-pos 1)) 2) 
-				(= (get-square S r-pos (+ c-pos 2)) 5)
-			 ) 
-			nil)
 			;Valid Moves
-			;Blank to right
-			((= (get-square S r-pos (+ c-pos 1)) 0) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					r-pos (+ c-pos 1) 3
+			;Moves that Need One Space to right or left
+			((not (null (get-square S r-pos (funcall Dfun c-pos 1))))
+				(cond
+					;Blank to right or left
+					((= (get-square S r-pos (funcall Dfun c-pos 1)) 0) 
+						(set-square 
+							(set-square S r-pos c-pos new-keeper) 
+							r-pos (funcall Dfun c-pos 1) 3
+						)
+					)
+					;Goal to right or left
+					((= (get-square S r-pos (funcall Dfun c-pos 1)) 4) 
+						(set-square 
+							(set-square S r-pos c-pos new-keeper) 
+							r-pos (funcall Dfun c-pos 1) 6
+						)
+					)
+					;Moves that Need 2 Spaces to right or left
+					((not (null (get-square S r-pos (funcall Dfun c-pos 2))))
+						(cond
+							;Box then blank to right or left
+							((and
+								(= (get-square S r-pos (funcall Dfun c-pos 1)) 2) 
+								(= (get-square S r-pos (funcall Dfun c-pos 2)) 0) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										r-pos (funcall Dfun c-pos 1) 3
+									) 
+									r-pos (funcall Dfun c-pos 2) 2
+								)
+							)
+							;Box&Goal then blank to right or left
+							((and
+								(= (get-square S r-pos (funcall Dfun c-pos 1)) 5) 
+								(= (get-square S r-pos (funcall Dfun c-pos 2)) 0) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										r-pos (funcall Dfun c-pos 1) 6
+									) 
+									r-pos (funcall Dfun c-pos 2) 2
+								)
+							)
+							;Box then goal to right or left
+							((and
+								(= (get-square S r-pos (funcall Dfun c-pos 1)) 2) 
+								(= (get-square S r-pos (funcall Dfun c-pos 2)) 4) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										r-pos (funcall Dfun c-pos 1) 3
+									) 
+									r-pos (funcall Dfun c-pos 2) 5
+								)
+							)	
+							;Box&Goal then goal to right or left
+							((and
+								(= (get-square S r-pos (funcall Dfun c-pos 1)) 5) 
+								(= (get-square S r-pos (funcall Dfun c-pos 2)) 4) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										r-pos (funcall Dfun c-pos 1) 6
+									) 
+									r-pos (funcall Dfun c-pos 2) 5
+								)
+							)
+						)
+					)
 				)
 			)
-			;Goal to right
-			((= (get-square S r-pos (+ c-pos 1)) 4) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					r-pos (+ c-pos 1) 6
-				)
-			)
-			;Box then blank to right
-			((and
-				(= (get-square S r-pos (+ c-pos 1)) 2) 
-				(= (get-square S r-pos (+ c-pos 2)) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (+ c-pos 1) 3
-					) 
-					r-pos (+ c-pos 2) 2
-				)
-			)
-			;Box+Goal then blank to right
-			((and
-				(= (get-square S r-pos (+ c-pos 1)) 5) 
-				(= (get-square S r-pos (+ c-pos 2)) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (+ c-pos 1) 6
-					) 
-					r-pos (+ c-pos 2) 2
-				)
-			)
-			;Box then goal to right
-			((and
-				(= (get-square S r-pos (+ c-pos 1)) 2) 
-				(= (get-square S r-pos (+ c-pos 2)) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (+ c-pos 1) 3
-					) 
-					r-pos (+ c-pos 2) 5
-				)
-			)	
-			;Box+Goal then goal to right
-			((and
-				(= (get-square S r-pos (+ c-pos 1)) 5) 
-				(= (get-square S r-pos (+ c-pos 2)) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (+ c-pos 1) 6
-					) 
-					r-pos (+ c-pos 2) 5
-				)
-			)
+			;All Invalid Moves
 			(t nil)
 		)
 	)
 )
 
-(defun try-left (S D K)
+(defun try-up-down (S Dfun K)
 	(let (
 			(c-pos (car K))
 			(r-pos (cadr K))
+			;What the new keepers value will be (depending on if it sits on a goal or not)
 			(new-keeper (if (= (get-square S (cadr K) (car K)) 3) 0 4))
 		)
 		(cond
-			;Invalid Moves
-			;Wall to the left
-			((= (get-square S r-pos (- c-pos 1)) 1) nil)
-			;Box then Wall to the left
-			((and 
-				(= (get-square S r-pos (- c-pos 1)) 2) 
-				(= (get-square S r-pos (- c-pos 2)) 1)
-			 ) 
-			nil)
-			;Box+Goal then Wall to the left
-			((and 
-				(= (get-square S r-pos (- c-pos 1)) 5) 
-				(= (get-square S r-pos (- c-pos 2)) 1)
-			 ) 
-			nil)
-			;Box then Box to the left
-			((and 
-				(= (get-square S r-pos (- c-pos 1)) 2) 
-				(= (get-square S r-pos (- c-pos 2)) 2)
-			 ) 
-			nil)
-			;Box+goal then Box to the left
-			((and 
-				(= (get-square S r-pos (- c-pos 1)) 5) 
-				(= (get-square S r-pos (- c-pos 2)) 2)
-			 ) 
-			nil)
-			;Box then Box+goal to the left
-			((and 
-				(= (get-square S r-pos (- c-pos 1)) 2) 
-				(= (get-square S r-pos (- c-pos 2)) 5)
-			 ) 
-			nil)
 			;Valid Moves
-			;Blank to left
-			((= (get-square S r-pos (- c-pos 1)) 0) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					r-pos (- c-pos 1) 3
+			;Moves that Need One Space above or below
+			((not (null (get-square S (funcall Dfun r-pos 1) c-pos)))
+				(cond
+					;Blank above or below
+					((= (get-square S (funcall Dfun r-pos 1) c-pos) 0) 
+						(set-square 
+							(set-square S r-pos c-pos new-keeper) 
+							(funcall Dfun r-pos 1) c-pos 3
+						)
+					)
+					;Goal above or below
+					((= (get-square S (funcall Dfun r-pos 1)  c-pos) 4) 
+						(set-square 
+							(set-square S r-pos c-pos new-keeper) 
+							(funcall Dfun r-pos 1) c-pos 6
+						)
+					)
+					((not (null (get-square S (funcall Dfun r-pos 2) c-pos)))
+						(cond
+							;Box then blank above or below
+							((and
+								(= (get-square S (funcall Dfun r-pos 1) c-pos) 2) 
+								(= (get-square S (funcall Dfun r-pos 2) c-pos) 0) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										(funcall Dfun r-pos 1) c-pos 3
+									) 
+									(funcall Dfun r-pos 2) c-pos 2
+								)
+							)
+							;Box&Goal then blank above or below
+							((and
+								(= (get-square S (funcall Dfun r-pos 1) c-pos) 5) 
+								(= (get-square S (funcall Dfun r-pos 2) c-pos) 0) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										(funcall Dfun r-pos 1) c-pos 6
+									) 
+									(funcall Dfun r-pos 2) c-pos 2
+								)
+							)
+							;Box then goal above or below
+							((and
+								(= (get-square S (funcall Dfun r-pos 1) c-pos) 2) 
+								(= (get-square S (funcall Dfun r-pos 2) c-pos) 4) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										(funcall Dfun r-pos 1) c-pos 3
+									) 
+									(funcall Dfun r-pos 2) c-pos 5
+								)
+							)	
+							;Box&Goal then goal above or below
+							((and
+								(= (get-square S (funcall Dfun r-pos 1) c-pos) 5) 
+								(= (get-square S (funcall Dfun r-pos 2) c-pos) 4) 
+							 )
+								(set-square 
+									(set-square 
+										(set-square S r-pos c-pos new-keeper)
+										(funcall Dfun r-pos 1) c-pos 6
+									) 
+									(funcall Dfun r-pos 2) c-pos 5
+								)
+							)
+						)
+					)
 				)
 			)
-			;Goal to left
-			((= (get-square S r-pos (- c-pos 1)) 4) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					r-pos (- c-pos 1) 6
-				)
-			)
-			;Box then blank to left
-			((and
-				(= (get-square S r-pos (- c-pos 1)) 2) 
-				(= (get-square S r-pos (- c-pos 2)) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (- c-pos 1) 3
-					) 
-					r-pos (- c-pos 2) 2
-				)
-			)
-			;Box+Goal then blank to left
-			((and
-				(= (get-square S r-pos (- c-pos 1)) 5) 
-				(= (get-square S r-pos (- c-pos 2)) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (- c-pos 1) 6
-					) 
-					r-pos (- c-pos 2) 2
-				)
-			)
-			;Box then goal to left
-			((and
-				(= (get-square S r-pos (- c-pos 1)) 2) 
-				(= (get-square S r-pos (- c-pos 2)) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (- c-pos 1) 3
-					) 
-					r-pos (- c-pos 2) 5
-				)
-			)	
-			;Box+Goal then goal to left
-			((and
-				(= (get-square S r-pos (- c-pos 1)) 5) 
-				(= (get-square S r-pos (- c-pos 2)) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						r-pos (- c-pos 1) 6
-					) 
-					r-pos (- c-pos 2) 5
-				)
-			)
-			(t nil)
-		)
-	)
-)
-
-(defun try-down (S D K)
-	(let (
-			(c-pos (car K))
-			(r-pos (cadr K))
-			(new-keeper (if (= (get-square S (cadr K) (car K)) 3) 0 4))
-		)
-		(cond
-			;Invalid Moves
-			;Wall below
-			((= (get-square S (+ r-pos 1) c-pos) 1) nil)
-			;Box then Wall below
-			((and 
-				(= (get-square S (+ r-pos 1) c-pos) 2) 
-				(= (get-square S (+ r-pos 2) c-pos) 1)
-			 ) 
-			nil)
-			;Box+Goal then Wall below
-			((and 
-				(= (get-square S (+ r-pos 1) c-pos) 5) 
-				(= (get-square S (+ r-pos 2) c-pos) 1)
-			 ) 
-			nil)
-			;Box then Box below
-			((and 
-				(= (get-square S (+ r-pos 1) c-pos) 2) 
-				(= (get-square S (+ r-pos 2) c-pos) 2)
-			 ) 
-			nil)
-			;Box+goal then Box below
-			((and 
-				(= (get-square S (+ r-pos 1) c-pos) 5) 
-				(= (get-square S (+ r-pos 2) c-pos) 2)
-			 ) 
-			nil)
-			;Box then Box+goal below
-			((and 
-				(= (get-square S (+ r-pos 1) c-pos) 2) 
-				(= (get-square S (+ r-pos 2) c-pos) 5)
-			 ) 
-			nil)
-			;Valid Moves
-			;Blank below
-			((= (get-square S (+ r-pos 1) c-pos) 0) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					(+ r-pos 1) c-pos 3
-				)
-			)
-			;Goal below
-			((= (get-square S (+ r-pos 1) c-pos) 4) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					(+ r-pos 1) c-pos 6
-				)
-			)
-			;Box then blank below
-			((and
-				(= (get-square S (+ r-pos 1) c-pos) 2) 
-				(= (get-square S (+ r-pos 2) c-pos) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(+ r-pos 1) c-pos 3
-					) 
-					(+ r-pos 2) c-pos 2
-				)
-			)
-			;Box+Goal then blank below
-			((and
-				(= (get-square S (+ r-pos 1) c-pos) 5) 
-				(= (get-square S (+ r-pos 2) c-pos) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(+ r-pos 1) c-pos 6
-					) 
-					(+ r-pos 2) c-pos 2
-				)
-			)
-			;Box then goal below
-			((and
-				(= (get-square S (+ r-pos 1) c-pos) 2) 
-				(= (get-square S (+ r-pos 2) c-pos) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(+ r-pos 1) c-pos 3
-					) 
-					(+ r-pos 2) c-pos 5
-				)
-			)	
-			;Box+Goal then goal below
-			((and
-				(= (get-square S (+ r-pos 1) c-pos) 5) 
-				(= (get-square S (+ r-pos 2) c-pos) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(+ r-pos 1) c-pos 6
-					) 
-					(+ r-pos 2) c-pos 5
-				)
-			)
-			(t nil)
-		)
-	)
-)
-
-(defun try-up (S D K)
-	(let (
-			(c-pos (car K))
-			(r-pos (cadr K))
-			(new-keeper (if (= (get-square S (cadr K) (car K)) 3) 0 4))
-		)
-		(cond
-			;Invalid Moves
-			;Wall above
-			((= (get-square S (- r-pos 1) c-pos) 1) nil)
-			;Box then Wall above
-			((and 
-				(= (get-square S (- r-pos 1) c-pos) 2) 
-				(= (get-square S (- r-pos 2) c-pos) 1)
-			 ) 
-			nil)
-			;Box+Goal then Wall above
-			((and 
-				(= (get-square S (- r-pos 1) c-pos) 5) 
-				(= (get-square S (- r-pos 2) c-pos) 1)
-			 ) 
-			nil)
-			;Box then Box above
-			((and 
-				(= (get-square S (- r-pos 1) c-pos) 2) 
-				(= (get-square S (- r-pos 2) c-pos) 2)
-			 ) 
-			nil)
-			;Box+goal then Box above
-			((and 
-				(= (get-square S (- r-pos 1) c-pos) 5) 
-				(= (get-square S (- r-pos 2) c-pos) 2)
-			 ) 
-			nil)
-			;Box then Box+goal above
-			((and 
-				(= (get-square S (- r-pos 1) c-pos) 2) 
-				(= (get-square S (- r-pos 2) c-pos) 5)
-			 ) 
-			nil)
-			;Valid Moves
-			;Blank above
-			((= (get-square S (- r-pos 1) c-pos) 0) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					(- r-pos 1) c-pos 3
-				)
-			)
-			;Goal above
-			((= (get-square S (- r-pos 1) c-pos) 4) 
-				(set-square 
-					(set-square S r-pos c-pos new-keeper) 
-					(- r-pos 1) c-pos 6
-				)
-			)
-			;Box then blank above
-			((and
-				(= (get-square S (- r-pos 1) c-pos) 2) 
-				(= (get-square S (- r-pos 2) c-pos) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(- r-pos 1) c-pos 3
-					) 
-					(- r-pos 2) c-pos 2
-				)
-			)
-			;Box+Goal then blank above
-			((and
-				(= (get-square S (- r-pos 1) c-pos) 5) 
-				(= (get-square S (- r-pos 2) c-pos) 0) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(- r-pos 1) c-pos 6
-					) 
-					(- r-pos 2) c-pos 2
-				)
-			)
-			;Box then goal above
-			((and
-				(= (get-square S (- r-pos 1) c-pos) 2) 
-				(= (get-square S (- r-pos 2) c-pos) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(- r-pos 1) c-pos 3
-					) 
-					(- r-pos 2) c-pos 5
-				)
-			)	
-			;Box+Goal then goal above
-			((and
-				(= (get-square S (- r-pos 1) c-pos) 5) 
-				(= (get-square S (- r-pos 2) c-pos) 4) 
-			 )
-				(set-square 
-					(set-square 
-						(set-square S r-pos c-pos new-keeper)
-						(- r-pos 1) c-pos 6
-					) 
-					(- r-pos 2) c-pos 5
-				)
-			)
+			;All Invalid Moves
 			(t nil)
 		)
 	)
@@ -705,35 +443,34 @@
 
 (defun try-move (S D)
 	(cond
-		((equal D 'r) (try-right S D (getKeeperPosition S 0)))
-		((equal D 'l) (try-left S D (getKeeperPosition S 0)))
-		((equal D 'd) (try-down S D (getKeeperPosition S 0)))
-		((equal D 'u) (try-up S D (getKeeperPosition S 0)))
+		((equal D 'r) (try-right-left S #'+ (getKeeperPosition S 0)))
+		((equal D 'l) (try-right-left S #'- (getKeeperPosition S 0)))
+		((equal D 'd) (try-up-down S #'+ (getKeeperPosition S 0)))
+		((equal D 'u) (try-up-down S #'- (getKeeperPosition S 0)))
 		(t nil)
 	)
-	
 )
 
 
-; (setq ptest '(
-; 	   (1 1 1 1 1 1 1)
-; 	   (1 0 0 0 0 0 1)
-; 	   (1 0 0 2 0 0 1)
-; 	   (1 0 5 6 5 4 1)
-; 	   (1 0 0 2 0 0 1)
-; 	   (1 0 0 4 0 0 1)
-; 	   (1 1 1 1 1 1 1)
-; 	)
-; )
-; (printState ptest)
-; (setq ptestr (try-move ptest 'r))
-; (printState ptestr)
-; (setq ptestl (try-move ptest 'l))
-; (printState ptestl)
-; (setq ptestd (try-move ptest 'd))
-; (printState ptestd)
-; (setq ptestd (try-move ptest 'u))
-; (printState ptestd)
+(setq ptest '(
+	   (1 1 1 1 1 1 1)
+	   (1 0 3 0 0 0 1)
+	   (1 0 0 2 0 0 1)
+	   (1 0 5 0 2 4 1)
+	   (1 0 0 2 0 0 1)
+	   (1 0 3 4 0 0 1)
+	   (1 1 2 1 1 1 1)
+	)
+)
+(printState ptest)
+(setq ptestr (try-move ptest 'r))
+(printState ptestr)
+(setq ptestl (try-move ptest 'l))
+(printState ptestl)
+(setq ptestd (try-move ptest 'd))
+(printState ptestd)
+(setq ptestd (try-move ptest 'u))
+(printState ptestd)
 
 
 (defun next-states (s)
