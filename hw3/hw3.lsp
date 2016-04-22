@@ -184,15 +184,15 @@
 	)
 )
 
-(setq p1 '((1 1 1 1 1 1)
-	   (1 0 3 0 0 1)
-	   (1 0 2 0 0 1)
-	   (1 1 0 1 1 1)
-	   (1 0 0 0 0 1)
-	   (1 0 0 0 4 1)
-	   (1 1 1 1 1 1)))
-(format t "(check-row (car p1)) = T? --> ~S~%" (check-row (car p1)))
-(format t "(check-row (third p1)) = nil? --> ~S~%" (check-row (third p1)))
+; (setq p1 '((1 1 1 1 1 1)
+; 	   (1 0 3 0 0 1)
+; 	   (1 0 2 0 0 1)
+; 	   (1 1 0 1 1 1)
+; 	   (1 0 0 0 0 1)
+; 	   (1 0 0 0 4 1)
+; 	   (1 1 1 1 1 1)))
+; (format t "(check-row (car p1)) = T? --> ~S~%" (check-row (car p1)))
+; (format t "(check-row (third p1)) = nil? --> ~S~%" (check-row (third p1)))
 
 (defun goal-test (s)
 	(cond
@@ -228,10 +228,10 @@
 	)
 )
 
-(format t "(get-square p1 0 0) = 1? --> ~S~%" (get-square p1 0 0))
-(format t "(get-square p1 5 4) = 4? --> ~S~%" (get-square p1 5 4))
-(format t "(get-square p1 1 2) = 3? --> ~S~%" (get-square p1 1 2))
-(format t "(getKeeperPosition p1 0) = '(2 1)? --> ~S~%" (getKeeperPosition p1 0))
+; (format t "(get-square p1 0 0) = 1? --> ~S~%" (get-square p1 0 0))
+; (format t "(get-square p1 5 4) = 4? --> ~S~%" (get-square p1 5 4))
+; (format t "(get-square p1 1 2) = 3? --> ~S~%" (get-square p1 1 2))
+; (format t "(getKeeperPosition p1 0) = '(2 1)? --> ~S~%" (getKeeperPosition p1 0))
 
 (defun set-square (S r c v)
 	(let (
@@ -743,16 +743,16 @@
 		 (y (cadr pos))
 		 ;x and y are now the coordinate of the keeper in s.
 		 (result (append 
-		 			(try-move s 'r)
-		 			(try-move s 'l)
-		 			(try-move s 'd)
-		 			(try-move s 'u)
+		 			(list (try-move s 'r))
+		 			(list (try-move s 'l))
+		 			(list (try-move s 'd))
+		 			(list (try-move s 'u))
 		 		)
 		 )
-	 )
+	)
     (cleanUpList result);end
-   );end let
-  );
+  );end let
+);
 
 ; (setq s1 '((1 1 1 1 1)
 ;  (1 0 0 4 1)
@@ -795,14 +795,116 @@
 	(count-row-boxes s 0)
 )
 
-(setq ph1test '((1 1 1 1 1 1)
-	   (1 0 3 2 2 1)
-	   (1 0 2 0 0 1)
-	   (1 1 0 1 1 1)
-	   (1 0 2 0 2 1)
-	   (1 5 0 2 4 1)
-	   (1 1 1 1 1 1)))
-(format t "(h1 ph1test) = 6? --> ~S~%" (h1 ph1test))
+(defun get-elem-columns (row row-num col-num elem elist)
+	(cond
+		((null row) elist)
+		((= (car row) elem)  
+			(get-elem-columns (cdr row) row-num (+ col-num 1) elem
+				(append elist (list (list row-num col-num)))
+			)
+		)
+		(t (get-elem-columns (cdr row) row-num (+ col-num 1) elem elist))
+	)
+)
+
+(defun get-elem-rows (s row-num elem)
+	(cond
+		((null s) nil)
+		(t (append
+			(get-elem-columns (car s) row-num 0 elem nil) 
+			(get-elem-rows (cdr s) (+ row-num 1) elem)
+		   ) 
+		)
+	)
+)
+
+(defun dist (e1 e2)
+	(let (
+			(x1 (car e1))
+			(y1 (cadr e1))
+			(x2 (car e2))
+			(y2 (cadr e2))
+		)
+		(sqrt 
+			(+ (expt (- x2 x1) 2) (expt (- y2 y1) 2))
+		)
+	)
+)
+
+(defun min-dist (box goals min)
+	(cond
+		((null goals) min)
+		((< (dist box (car goals)) min) 
+			(min-dist box (cdr goals) (dist box (car goals)))
+		)
+		(t (min-dist box (cdr goals) min))
+	)
+)
+
+(setq gbtest '(
+	   (1 1 1 1 1 1 1)
+	   (1 0 2 0 2 0 1)
+	   (1 0 0 2 4 0 1)
+	   (1 4 5 6 5 4 1)
+	   (1 0 0 2 0 0 1)
+	   (1 0 0 4 2 0 1)
+	   (1 1 1 1 1 1 1)
+	)
+)
+(format t "getting boxes (get-elem-rows gbtest 0 2) = ~S~%" (get-elem-rows gbtest 0 2))
+(format t "getting goals (get-elem-rows gbtest 0 4) = ~S~%" (get-elem-rows gbtest 0 4))
+
+(defun max-min-dist (boxes goals max-bg-dist max)
+	(cond
+		((null boxes) max)
+		((> (min-dist (car boxes) goals max-bg-dist) max)
+			(max-min-dist (cdr boxes) goals max-bg-dist (min-dist (car boxes) goals max-bg-dist))
+		)
+		(t (max-min-dist (cdr boxes) goals max-bg-dist max))
+	)
+)
+
+;maximum minimum distance from a box to a goal
+(defun h2 (s)
+	(let (
+			(boxes (get-elem-rows s 0 2))
+			(goals (get-elem-rows s 0 4))
+			(max-bg-dist (* (length s) (length (car s))))
+		)
+		(floor (max-min-dist boxes goals max-bg-dist 0))
+	)
+)
+
+(defun sum-min-dists (boxes goals max-bg-dist sum)
+	(cond
+		((null boxes) sum)
+		(t (sum-min-dists 
+				(cdr boxes) goals max-bg-dist 
+				(+ sum (min-dist (car boxes) goals max-bg-dist))
+		   )
+		)
+	)
+)
+
+;sum of minimum distances from boxes to goal
+(defun h3 (s)
+	(let (
+			(boxes (get-elem-rows s 0 2))
+			(goals (get-elem-rows s 0 4))
+			(max-bg-dist (* (length s) (length (car s))))
+		)
+		(floor (sum-min-dists boxes goals max-bg-dist 0))
+	)
+)
+
+; (setq ph1test '((1 1 1 1 1 1)
+; 	   (1 0 3 2 2 1)
+; 	   (1 0 2 0 0 1)
+; 	   (1 1 0 1 1 1)
+; 	   (1 0 2 0 2 1)
+; 	   (1 5 0 2 4 1)
+; 	   (1 1 1 1 1 1)))
+; (format t "(h1 ph1test) = 6? --> ~S~%" (h1 ph1test))
 ; (format t "(check-row (third p1)) = nil? --> ~S~%" (check-row (third p1)))
 
 ; EXERCISE: Change the name of this function to h<UID> where
