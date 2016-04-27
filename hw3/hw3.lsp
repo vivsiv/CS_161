@@ -770,15 +770,6 @@
 	)
 )
 
-(defun h5 (s)
-	(let (
-			(top-box (car (get-elem-pos s 0 box)))
-			(goals (get-elem-pos s 0 star))
-		)
-		(min-tile-dist top-box goals 0)
-	)
-)
-
 ; (setq ph1test '((1 1 1 1 1 1)
 ; 	   (1 0 3 2 2 1)
 ; 	   (1 0 2 0 0 1)
@@ -799,14 +790,31 @@
 ; running time of a function call.
 ;
 
-;I did some random sampliing of testing with each of the heuristics for run time. I expected the 
-;sum min dist or sum tile dist to do the best however I was surprised to find that these heuristics 
-;performed very slowly compared to h0 on several inputs. I deduced that doing multiple recursive fn calls
-;at each round even if they are tail recursive massively slows down the a* search even if
-;you are checking fewer nodes. Therefore I went with a more simply computed heuristic that still provides
-;more information than h0
+
+
+(defun diagonal-rows (s count)
+	(cond
+		((null s) nil)
+		(t (cons (car (nthcdr count (car s))) (diagonal-rows (cdr s) (+ count 1))))
+	)
+)
+
+
+(defun diagonal (s)
+	(diagonal-rows s 0)	
+)
+
+;I did some random sampling of testing with each of the heuristics for run time. 
+;At smaller input sizes the sum min tile dist performed the best in time and expanded nondes, 
+;this made sense as it was the heuristic that provided the most information.
+;However at larger input sizes it began to run very slowly compared to h0 despite still expanding fewer nodes
+;I attribute this to the inefficiency of setting up multiple recursive function calls for each call to compute the
+;heurisitic, I think the logic of the heuristic is sound but it needs a more efficient implementation with
+;some saved state and looping constructs. For the purposes of this assignment I chose to submit h4 because it seems
+;to perform the best within the limits of its computation. If time was all I cared about I would use h0 or a more 
+;efficient h4 for the larger inputs.
 (defun h303652195 (s)
-	h1(s)
+	(h4 s)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
